@@ -1,7 +1,20 @@
 const router = require("express").Router();
 const { json } = require("body-parser");
 const { Admin } = require("../models/Admin");
+const { User } = require("../models/User");
 
+
+router.get('/getAllUsers',async(req,res)=>{
+	console.log("1")
+	try {
+		console.log("2")
+		const response = await User.find()
+		console.log("3", response)
+		return res.status(200).send(response)
+	} catch (error) {
+		return res.status(500).send(error)
+	}
+})
 
 
 router.post("/signupad", async (req, res) => {

@@ -1,5 +1,4 @@
-const express = require('express')
-const router = express.Router()
+const router = require("express").Router();
 const WorkOut = require('../models/WorkOutData')
 
 
@@ -7,8 +6,10 @@ router.get('/test',(req,res)=>{
     res.send('Inside route')
 })
 //Get all Workout logs
-router.get('/',async(req,res)=>{
+router.get('/get',async(req,res)=>{
+    console.log("1")
     try {
+        console.log("2")
         const response = await WorkOut.find({})
         res.send(response)
     } catch (error) {
@@ -18,6 +19,7 @@ router.get('/',async(req,res)=>{
 
 //Get all Workout logs of Single User
 router.get('/:userName',async(req,res)=>{
+    console.log("1")
     try {
         console.log('inside username', req.params.userName);
         const response = await WorkOut.find({userName : req.params.userName})
