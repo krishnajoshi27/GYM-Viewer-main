@@ -3,30 +3,50 @@ import '../css/workStyles.css';
 import axios from 'axios';
 
 export default function AdminHome() {
-
-const[data, setData]=useState([]);
+  const [data, setData] = useState([]);
+  const [feedback, setFeedback] = useState({
+    userId: '',
+    performance: '',
+    comment: '',
+  });
 
   useEffect(() => {
-   getAllUserData()
-  
-  }, [])
+    getAllUserData();
+  }, []);
 
   const getAllUserData = async () => {
-    const userData = await axios("http://localhost:8080/admin/getAllUsers")
-  console.log(userData.data)
-  setData(userData.data);
-  }
-  ///const users = [
+    const userData = await axios.get('http://localhost:8080/admin/getAllUsers');
+    setData(userData.data);
+  };
 
-  //   {
-  //     _id: "64ae0e24f7a3264db2d8e9cf",
-  //     firstName: "Krishna",
-  //     lastName: "Joshi",
-  //     email: "krishnajoshi316@gmail.com",
-  //     password: "$2b$10$5gLW9aMemC6OxEom46YdCecBPoFuJfrVES8g4GePglj4jMfHBfJeu",
-  //     verified: true
-  //   }
-  // ];
+  const handleInputChange = (event) => {
+    setFeedback({
+      ...feedback,
+      [event.target.name]: event.target.value,
+    });
+  };
+
+  const handleSubmit = async (event) => {
+    event.preventDefault();
+
+    try {
+      // Send feedback data to the backend API endpoint
+      await axios.post('http://localhost:8080/admin/submitFeedback', feedback);
+
+      // Clear the form input values
+      setFeedback({
+        userId: '',
+        performance: '',
+        comment: '',
+      });
+
+      // Display a success message or perform any desired actions
+      console.log('Feedback submitted successfully!');
+    } catch (error) {
+      // Handle any errors that occur during form submission
+      console.error('Error submitting feedback:', error);
+    }
+  };
 
   return (
     <div className="grid-workStyles">
@@ -43,18 +63,55 @@ const[data, setData]=useState([]);
           </tr>
         </thead>
         <tbody>
-          {data && data.map((user) => (
-            <tr key={user._id}>
-              <td>{user._id}</td>
-              <td>{user.firstName}</td>
-              <td>{user.lastName}</td>
-              <td>{user.email}</td>
-              <td>{user.password}</td>
-              <td>{user.verified ? "Yes" : "No"}</td>
-            </tr>
-          ))}
+          {data &&
+            data.map((user) => (
+              <tr key={user._id}>
+                <td>{user._id}</td>
+                <td>{user.firstName}</td>
+                <td>{user.lastName}</td>
+                <td>{user.email}</td>
+                <td>{user.password}</td>
+                <td>{user.verified ? 'Yes' : 'No'}</td>
+                <td>
+                  <button
+                    onClick={() => setFeedback({ ...feedback, userId: user._id })}
+                  >
+                    Provide Feedback
+                  </button>
+                </td>
+              </tr>
+            ))}
         </tbody>
       </table>
+
+      {/* Feedback Form */}
+      {feedback.userId && (
+        <div className="feedback-section">
+          <h2>Provide Feedback</h2>
+          <form onSubmit={handleSubmit}>
+            <div>
+              <label htmlFor="performance">Performance:</label>
+              <input
+                type="text"
+                id="performance"
+                name="performance"
+                value={feedback.performance}
+                onChange={handleInputChange}
+              />
+            </div>
+            <div>
+              <label htmlFor="comment">Comment:</label>
+              <textarea
+                id="comment"
+                name="comment"
+                value={feedback.comment}
+                onChange={handleInputChange}
+              ></textarea>
+            </div>
+            <button type="submit">Submit Feedback</button>
+          </form>
+        </div>
+      )}
     </div>
   );
 }
