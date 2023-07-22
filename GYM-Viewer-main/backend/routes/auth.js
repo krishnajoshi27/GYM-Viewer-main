@@ -7,10 +7,39 @@ const Token = require('../models/Token')
 const sendEmail = require('../utils/sendEmail')
 const crypto = require('crypto');
 const Otp = require("../models/Otp");
+const redis= require('redis');
+
+
+
+const redisUrl = "redis://127.0.0.1:6379"
+const client = redis.createClient(redisUrl)
+
+client.set=util.promisify(client.set)
+client.get=util.promisify(client.get)
+
 
 //To get All Users
 router.get('/getAllUsers',async(req,res)=>{
 	try {
+ //Redis-Caching
+const courseId = req.params.id;
+const cachedUser= await client.get(`users-${Id}`)
+if(cachedUser){
+const users = JSON.parse(cachedUser);
+return res.status(200).json({
+  data: users,
+});
+}
+const users = await user.findById(Id);
+if (!users) {
+return res.status(404).json({
+  message: "Users not found",
+});
+}
+
+await client.set(`users-${courseId}`, JSON.stringify(course));
+
+//over
 		const response = await User.find({})
 		return res.status(200).send(response)
 	} catch (error) {

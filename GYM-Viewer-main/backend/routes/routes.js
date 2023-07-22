@@ -1,6 +1,11 @@
 const router = require("express").Router();
 const WorkOut = require('../models/WorkOutData')
+const redis= require('redis');
 
+
+
+const redisUrl = "redis://127.0.0.1:6379"
+const client = redis.createClient(redisUrl)
 
 router.get('/test',(req,res)=>{
     res.send('Inside route')
